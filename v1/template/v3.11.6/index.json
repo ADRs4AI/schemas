@@ -1,0 +1,32 @@
+{
+  "what": "ADRs4AI teaching bundle \u2014 machine index",
+  "tag": "v3.11.6",
+  "built": "2026-10-12T03:43:39Z",
+  "source": "https://github.com/ADRs4AI/human-ai-collaboration-template-A",
+  "concept_doi": "10.5281/zenodo.23303469",
+  "bundle": "template-v3.11.6.md",
+  "files": [
+    "CLAUDE.md",
+    "README.md",
+    "QUICK-START.md",
+    "LICENSE",
+    "TEMPLATE-OUTPUT-GRANT.md",
+    "justfile",
+    "docs/METHODOLOGY.md",
+    "docs/adr/templates/AGENTS.md",
+    "docs/adr/templates/adr-madr.md",
+    "docs/adr/templates/adr.md",
+    "docs/adr/templates/debrief.md",
+    "docs/adr/templates/failure-classes.md",
+    "docs/adr/templates/seed.md",
+    "docs/inbox/CONVENTIONS.md",
+    "docs/inbox/ENCODING-MAP.md",
+    "docs/inbox/INBOX-PROTOCOL.md",
+    "docs/inbox/ONBOARDING.md",
+    ".claude/skills/adr-authoring/SKILL.md",
+    ".claude/skills/adr-authoring/references/depth.md",
+    ".claude/skills/adr-authoring/references/freshening.md",
+    ".claude/skills/adr-authoring/references/questions-reference.md"
+  ],
+  "fence_length": 4
+}

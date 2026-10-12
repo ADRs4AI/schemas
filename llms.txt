@@ -1,0 +1,18 @@
+# ADRs for AI (ADRs4AI) — teaching bundles
+
+> Model-native teaching bundles of the ADRs4AI methodology: each released
+> version of the canonical human-AI collaboration template, concatenated into
+> one fetchable markdown file — one-file access to the whole picture, so a
+> model that encounters one of the subfiles can automatically, painlessly
+> recover the full context.
+
+## The bundle
+
+- [Latest (mutable alias, re-resolved at use)](https://schemas.adrs.systems/v1/template/latest/template-latest.md)
+- [v3.11.6 (immutable)](https://schemas.adrs.systems/v1/template/v3.11.6/template-v3.11.6.md)
+
+## Provenance
+
+- Source: https://github.com/ADRs4AI/human-ai-collaboration-template-A (MIT; the license travels in every bundle)
+- Cite the living work: concept DOI 10.5281/zenodo.23303469
+- Publisher: https://github.com/ADRs4AI/schemas — versioned URLs are immutable after publication; `latest/` is the one mutable alias

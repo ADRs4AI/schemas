@@ -1,0 +1,64 @@
+name: publish-bundle
+# ADR-0043 (ADRs4AI HQ): on each template release, transform the tag into one
+# teaching bundle at an immutable versioned path + refresh the latest alias.
+# Fence safety is PROVEN before publish (round-trip test); a failing proof
+# refuses the publish — never ship an unproven bundle.
+
+on:
+  repository_dispatch:
+    types: [template-release]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Template release tag (e.g. v3.12.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag
+        id: tag
+        run: |
+          TAG="${{ github.event.client_payload.tag || github.event.inputs.tag }}"
+          if [ -z "$TAG" ]; then echo "no tag provided" >&2; exit 1; fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout publisher
+        uses: actions/checkout@v4
+
+      - name: Checkout template at tag
+        uses: actions/checkout@v4
+        with:
+          repository: ADRs4AI/human-ai-collaboration-template-A
+          ref: ${{ steps.tag.outputs.tag }}
+          path: _source
+          fetch-depth: 1
+
+      - name: Prove fence safety (round-trip)
+        run: |
+          python3 scripts/test_roundtrip.py \
+            --source _source --tag "${{ steps.tag.outputs.tag }}" --scope scope.json
+
+      - name: Build bundle + refresh latest + index
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
+          SHA=$(git -C _source rev-parse --short HEAD)
+          python3 scripts/concat.py build --source _source --tag "$TAG" \
+            --scope scope.json --out-dir "v1/template/$TAG" --source-sha "$SHA"
+          mkdir -p v1/template/latest
+          cp "v1/template/$TAG/template-$TAG.md" v1/template/latest/template-latest.md
+          cp "v1/template/$TAG/index.json" v1/template/latest/index.json
+          python3 scripts/update_llms_txt.py
+
+      - name: Commit and publish
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
+          git config user.name "schemas-publisher"
+          git config user.email "noreply@adrs.systems"
+          git add "v1/template/$TAG" v1/template/latest llms.txt
+          git commit -m "publish: teaching bundle $TAG (round-trip proven)"
+          git push

@@ -1,0 +1,21 @@
+{
+  "_comment": "The teaching-corpus manifest — ADR-0043 scope A as amended at It-2/It-3 (reviewable curation, never vibes). Ordered include globs; first match wins; exclusions are explicit so every absence is legible. LICENSE rides in-bundle (MIT's notice travels with substantial portions; the output-grant's waiver does not cover redistributing the template itself). CHANGELOG and TEMPLATE-UPDATES are pointers-not-cargo (history, one URL away). Missing globs are tolerated (e.g. placeholders.yaml predates nothing before v3.12).",
+  "include": [
+    "CLAUDE.md",
+    "README.md",
+    "QUICK-START.md",
+    "LICENSE",
+    "TEMPLATE-OUTPUT-GRANT.md",
+    "justfile",
+    "docs/METHODOLOGY.md",
+    "docs/adr/templates/*.md",
+    "docs/adr/templates/placeholders.yaml",
+    "docs/inbox/*.md",
+    ".claude/skills/*/SKILL.md",
+    ".claude/skills/*/references/*.md"
+  ],
+  "exclude": [
+    "CHANGELOG.md",
+    "TEMPLATE-UPDATES.md"
+  ]
+}
