@@ -31,7 +31,7 @@ lines += [
     "",
     "## Provenance",
     "",
-    "- Source: https://github.com/ADRs4AI/human-ai-collaboration-template-A (MIT; the license travels in every bundle)",
+    "- Source: https://github.com/ADRs4AI/human-ai-collaboration-template-A (Apache-2.0; the license and NOTICE travel in every bundle)",
     "- Cite the living work: concept DOI 10.5281/zenodo.23303469",
     "- Publisher: https://github.com/ADRs4AI/schemas — versioned URLs are immutable after publication; `latest/` is the one mutable alias",
     "",

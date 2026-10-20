@@ -38,6 +38,9 @@ jobs:
           path: _source
           fetch-depth: 1
 
+      - name: Regression — trailing-newline classes + legacy marker
+        run: python3 scripts/test_trailing_newlines.py
+
       - name: Prove fence safety (round-trip)
         run: |
           python3 scripts/test_roundtrip.py \

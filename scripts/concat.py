@@ -26,7 +26,8 @@ MISSION = ("one-file access to the whole picture, so a model that encounters "
            "one of the subfiles can automatically, painlessly recover the full "
            "context")  # the founder's sentence, ADR-0043 It-3 — the mirror's purpose
 CONCEPT_DOI = "10.5281/zenodo.23303469"
-FILE_HEADER_RE = re.compile(r"^## FILE: (.+?)( \(no-final-newline\))?$")
+FILE_HEADER_RE = re.compile(
+    r"^## FILE: (.+?)( \(no-final-newline\)| \(trailing-newlines: \d+\))?$")
 
 
 def gather(source, scope_path):
@@ -81,8 +82,8 @@ def build(args):
 > - **Built**: {now} by the schemas publisher (https://github.com/ADRs4AI/schemas)
 > - **Cite the living work**: concept DOI `{CONCEPT_DOI}` (always resolves to the
 >   latest archived release); pin a version DOI only for reproducibility claims.
-> - **License**: MIT — the full text travels in this bundle (see `LICENSE` below);
->   this bundle is a substantial portion and the notice rides with it.
+> - **License**: Apache-2.0 — the full text travels in this bundle (see `LICENSE`
+>   below, with `NOTICE` beside it, as §4 asks of every redistribution).
 > - **Immutability vow**: the versioned URL serving this file never changes
 >   content after publication; `latest/` is the one mutable alias.
 > - **Format**: every file appears as `## FILE: <path>` followed by its exact
@@ -97,11 +98,16 @@ def build(args):
     out.append("\n---\n")
     for rel in files:
         raw = contents[rel]
-        marker = "" if raw.endswith("\n") else " (no-final-newline)"
-        body = raw if raw.endswith("\n") else raw + "\n"
+        # Trailing newlines cannot survive inside the fence (the closing fence
+        # needs its own line), so their COUNT rides in the header: absent means
+        # exactly one; "(trailing-newlines: N)" covers 0, 2, 3… — the one-bit
+        # "(no-final-newline)" marker lost a byte on every blank-line-terminated
+        # file (caught by the round-trip gate on v3.12.0's Apache LICENSE).
+        n_trail = len(raw) - len(raw.rstrip("\n"))
+        marker = "" if n_trail == 1 else f" (trailing-newlines: {n_trail})"
         out.append(f"## FILE: {rel}{marker}\n")
         out.append(f"{fence}{lang_of(rel)}")
-        out.append(body.rstrip("\n"))
+        out.append(raw.rstrip("\n"))
         out.append(f"{fence}\n")
     bundle = "\n".join(out) + "\n"
 
@@ -122,12 +128,12 @@ def build(args):
 
 def extract(args):
     lines = open(args.bundle, encoding="utf-8").read().split("\n")
-    i, current, marker_flag, fence, buf = 0, None, False, None, []
+    i, current, fence, buf = 0, None, None, []
     wrote = 0
     while i < len(lines):
         m = FILE_HEADER_RE.match(lines[i])
         if m:
-            current, marker_flag = m.group(1), bool(m.group(2))
+            current, suffix = m.group(1), m.group(2)
             i += 1
             while i < len(lines) and not lines[i].startswith("```"):
                 i += 1
@@ -136,9 +142,14 @@ def extract(args):
             buf = []
             while i < len(lines) and lines[i] != fence:
                 buf.append(lines[i]); i += 1
-            content = "\n".join(buf) + "\n"
-            if marker_flag:
-                content = content[:-1]
+            body = "\n".join(buf)
+            if suffix is None:
+                content = body + "\n"            # the default: exactly one
+            elif "no-final-newline" in suffix:
+                content = body                   # legacy one-bit marker (pre-v3.12 bundles)
+            else:
+                n = int(re.search(r"\d+", suffix).group(0))
+                content = body + "\n" * n
             dest = os.path.join(args.out_dir, current)
             os.makedirs(os.path.dirname(dest) or ".", exist_ok=True)
             open(dest, "w", encoding="utf-8").write(content)

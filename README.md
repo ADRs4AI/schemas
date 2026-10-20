@@ -27,12 +27,12 @@ single URL, so any model anywhere can learn the methodology in one fetch:
   consumes the template only through its public GitHub Releases, the same door
   strangers use.
 - **Scope is a reviewable manifest** ([`scope.json`](scope.json)), never vibes;
-  the MIT `LICENSE` rides in every bundle (its notice travels with substantial
-  portions).
+  the Apache-2.0 `LICENSE` and `NOTICE` ride in every bundle (§4's redistribution
+  terms, honored by construction).
 
 Builds trigger on each template release (`repository_dispatch`) or manually
 (`workflow_dispatch` with a tag). Pattern precedent, honored: the maintainer's
 own pre-Repomix concatenator
 ([gist](https://gist.github.com/jlumbroso/f9c18f116e3fa5250bbd388245b10f1d)).
 
-Part of the [ADRs4AI](https://github.com/ADRs4AI) ecosystem · MIT
+Part of the [ADRs4AI](https://github.com/ADRs4AI) ecosystem · Apache-2.0
