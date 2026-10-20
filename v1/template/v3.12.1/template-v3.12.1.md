@@ -4,7 +4,7 @@
 > concatenated into one fetchable file — one-file access to the whole picture, so a model that encounters one of the subfiles can automatically, painlessly recover the full context.
 >
 > - **Source**: https://github.com/ADRs4AI/human-ai-collaboration-template-A at tag `v3.12.1` (commit `062ad76`)
-> - **Built**: 2026-10-20T18:40:35Z by the schemas publisher (https://github.com/ADRs4AI/schemas)
+> - **Built**: 2026-10-20T21:27:23Z by the schemas publisher (https://github.com/ADRs4AI/schemas)
 > - **Cite the living work**: concept DOI `10.5281/zenodo.23303469` (always resolves to the
 >   latest archived release); pin a version DOI only for reproducibility claims.
 > - **License**: Apache-2.0 — the full text travels in this bundle (see `LICENSE`
