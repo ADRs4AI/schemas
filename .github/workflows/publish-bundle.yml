@@ -62,6 +62,6 @@ jobs:
           TAG="${{ steps.tag.outputs.tag }}"
           git config user.name "schemas-publisher"
           git config user.email "noreply@adrs.systems"
-          git add "v1/template/$TAG" v1/template/latest llms.txt
+          git add "v1/template/$TAG" v1/template/latest llms.txt index.html
           git commit -m "publish: teaching bundle $TAG (round-trip proven)"
           git push
