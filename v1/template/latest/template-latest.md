@@ -1,10 +1,10 @@
-# ADRs for AI: Human-AI Collaboration Template A — teaching bundle, v3.12.0
+# ADRs for AI: Human-AI Collaboration Template A — teaching bundle, v3.12.1
 
 > **What this is**: the complete teaching corpus of the ADRs4AI methodology,
 > concatenated into one fetchable file — one-file access to the whole picture, so a model that encounters one of the subfiles can automatically, painlessly recover the full context.
 >
-> - **Source**: https://github.com/ADRs4AI/human-ai-collaboration-template-A at tag `v3.12.0` (commit `6b5cfad`)
-> - **Built**: 2026-10-20T16:40:20Z by the schemas publisher (https://github.com/ADRs4AI/schemas)
+> - **Source**: https://github.com/ADRs4AI/human-ai-collaboration-template-A at tag `v3.12.1` (commit `062ad76`)
+> - **Built**: 2026-10-20T18:40:35Z by the schemas publisher (https://github.com/ADRs4AI/schemas)
 > - **Cite the living work**: concept DOI `10.5281/zenodo.23303469` (always resolves to the
 >   latest archived release); pin a version DOI only for reproducibility claims.
 > - **License**: Apache-2.0 — the full text travels in this bundle (see `LICENSE`
@@ -21,12 +21,12 @@
 ## CONTENTS
 
 - `CLAUDE.md` (19900 bytes)
-- `README.md` (13313 bytes)
+- `README.md` (14314 bytes)
 - `QUICK-START.md` (4147 bytes)
 - `LICENSE` (11358 bytes)
 - `NOTICE` (233 bytes)
 - `TEMPLATE-OUTPUT-GRANT.md` (1181 bytes)
-- `justfile` (30377 bytes)
+- `justfile` (31623 bytes)
 - `docs/METHODOLOGY.md` (10676 bytes)
 - `docs/adr/templates/AGENTS.md` (1116 bytes)
 - `docs/adr/templates/adr-madr.md` (3162 bytes)
@@ -34,13 +34,13 @@
 - `docs/adr/templates/debrief.md` (5200 bytes)
 - `docs/adr/templates/failure-classes.md` (8996 bytes)
 - `docs/adr/templates/seed.md` (1927 bytes)
-- `docs/adr/templates/placeholders.yaml` (2266 bytes)
+- `docs/adr/templates/placeholders.yaml` (3228 bytes)
 - `docs/inbox/CONVENTIONS.md` (15394 bytes)
 - `docs/inbox/ENCODING-MAP.md` (3557 bytes)
 - `docs/inbox/INBOX-PROTOCOL.md` (17763 bytes)
 - `docs/inbox/ONBOARDING.md` (12077 bytes)
 - `.claude/skills/adr-authoring/SKILL.md` (15604 bytes)
-- `.claude/skills/adrs4ai-tooling/SKILL.md` (19790 bytes)
+- `.claude/skills/adrs4ai-tooling/SKILL.md` (20050 bytes)
 - `.claude/skills/question-tours/SKILL.md` (24810 bytes)
 - `.claude/skills/adr-authoring/references/depth.md` (5631 bytes)
 - `.claude/skills/adr-authoring/references/freshening.md` (7959 bytes)
@@ -687,6 +687,16 @@ This repo is the **record layer**: it travels with each project, self-contained.
 ```
 
 Home: [`ADRs4AI/plugins`](https://github.com/ADRs4AI/plugins) (Apache 2.0; versions always pinned — releases are deliberate). Once listed, it will also be installable from the Claude plugin directory on claude.ai.
+
+### The MCP server — the record's typed verbs
+
+Agents shouldn't grep a decision record; they should ask it. The [`@adrs4ai/mcp`](https://www.npmjs.com/package/@adrs4ai/mcp) server gives any MCP client — Claude Code, or anything speaking the protocol — typed verbs over the record (`list_open_questions`, `lookup`, `answer_question`, `apply_batch`, and the rest), through the format's one parser, [`@adrs4ai/docket-core`](https://www.npmjs.com/package/@adrs4ai/docket-core). Repos born from this template (v3.12 and later) already carry the stanza in `.mcp.json` at the root — a session restart loads it. Any other repo adds exactly this (the `.` is the repo the session sits in):
+
+```json
+{ "mcpServers": { "adrs4ai": { "command": "npx", "args": ["-y", "@adrs4ai/mcp", "."] } } }
+```
+
+The `adr` plugin above and this server are the same operator layer through two doors: the plugin carries the *teaching* (skills and commands), the MCP carries the *verbs*. Install both; they never conflict.
 
 ---
 
@@ -1758,14 +1768,36 @@ instantiate-check:
             LOCKWARN="⚠️  kintsugi.yaml present with NO kintsugi.lock — this instance is adopted-but-never-wired: no template fix will ever reach it. Run: kintsugi adopt"
         fi
     fi
-    if [[ -z "$HITS" ]]; then
-        echo "✅ instantiation complete — no ⟦SIGIL⟧ placeholders remain"
+    # Fixture files die at instantiation (the founder's ruling 2026-10-20;
+    # the registry's fixtures: section says why each row exists). Canonical
+    # keeps them by design — same origin==canonical-remote test as above;
+    # a repo with NO kintsugi.yaml cannot be canonical, so it is checked.
+    FIXHITS=""
+    IS_CANON=""
+    if [[ -f kintsugi.yaml ]]; then
+        CANON_R=$(grep -m1 '^  remote:' kintsugi.yaml | sed 's/^  remote: *//')
+        ORIGIN_R=$(git config --get remote.origin.url 2>/dev/null | sed 's/\.git$//; s|github.com/jlumbroso/human-ai-collaboration-template-A|github.com/ADRs4AI/human-ai-collaboration-template-A|')
+        [[ -n "$ORIGIN_R" && "$ORIGIN_R" == "$CANON_R" ]] && IS_CANON=1
+    fi
+    if [[ -z "$IS_CANON" ]]; then
+        while IFS= read -r fx; do
+            [[ -n "$fx" && -e "$fx" ]] && FIXHITS="${FIXHITS}${FIXHITS:+$'\n'}${fx}"
+        done < <(grep -E '^  - path: ' "$REG" 2>/dev/null | sed 's/^  - path: *//')
+    fi
+    if [[ -z "$HITS" && -z "$FIXHITS" ]]; then
+        echo "✅ instantiation complete — no ⟦SIGIL⟧ placeholders remain, no fixture files linger"
         [[ -n "$LOCKWARN" ]] && echo "$LOCKWARN" && exit 2
         exit 0
     fi
-    echo "⟦SIGILS⟧ remaining — fill-and-delete each (file:line:⟦TOKEN⟧):"
-    echo "$HITS"
-    echo "— $(echo "$HITS" | wc -l | tr -d ' ') occurrence(s). The registry explains each token: $REG"
+    if [[ -n "$HITS" ]]; then
+        echo "⟦SIGILS⟧ remaining — fill-and-delete each (file:line:⟦TOKEN⟧):"
+        echo "$HITS"
+        echo "— $(echo "$HITS" | wc -l | tr -d ' ') occurrence(s). The registry explains each token: $REG"
+    fi
+    if [[ -n "$FIXHITS" ]]; then
+        echo "fixture files remain — template-only artifacts; DELETE each (the registry's fixtures: section says why):"
+        echo "$FIXHITS"
+    fi
     [[ -n "$LOCKWARN" ]] && echo "$LOCKWARN"
     exit 1
 
@@ -3078,6 +3110,20 @@ tokens:
   GATE-WHY:
     files: [CLAUDE.md]
     note: what the gate actually catches; an unfollowable directive teaches that directives are decorative
+
+# ---------------------------------------------------------------------------
+# FIXTURE FILES — template-only artifacts that DIE AT INSTANTIATION.
+# The founder's ruling, 2026-10-20: "TEMPLATE-OUTPUT-GRANT.md should be on no
+# repo but the template." Four cold-boot reports each made ~20 keep-or-delete
+# judgment calls (porthole item 20), and a judgment call on a legal-looking
+# file loses to caution every time — so deletion is MANDATED, not judged:
+# `just instantiate-check` FAILS on an instance while any path below exists.
+# The canonical template is exempt (origin == the manifest's canonical remote,
+# the same test the lock-warn uses). A row joins this list only with a ruling;
+# roster deliberation: HQ seed-2026-10-20-fixture-files-die-at-birth.
+fixtures:
+  - path: TEMPLATE-OUTPUT-GRANT.md
+    why: the rights-holder's standing grant to instantiators — the promise lives at the source repo and covers you without the paper (ruled 2026-10-20)
 ````
 
 ## FILE: docs/inbox/CONVENTIONS.md
@@ -4036,8 +4082,10 @@ This template ships wired for a toolchain it cannot assume is installed. This sk
 **Detect**: does the session have `mcp__adrs4ai__*` tools? (`/mcp` lists connected servers. A hive wired before 2026-10-20 may carry the retired key `adrs-for-ai` — same tools; offer the re-key, it is one word in `.mcp.json`.) **Explain**: without it you grep the record; with it you get typed verbs — `list_open_questions`, `answer_question`, `apply_batch` — that answer in seconds what greps reconstruct, and never fumble a status flip. **Offer**: the server is live on npm — `@adrs4ai/mcp`, a thin stdio mouth over `@adrs4ai/docket-core`. Template instances born ≥ v3.12 ship the stanza in `.mcp.json` at root; a session restart loads it. Older instances and bare repos add exactly this (the `.` is the corpus root — the repo the session sits in):
 
 ```json
-{"mcpServers": {"adrs4ai": {"command": "npx", "args": ["-y", "@adrs4ai/mcp", "."]}}}
+{"mcpServers": {"adrs4ai": {"command": "npx", "args": ["-y", "@adrs4ai/mcp@0.1.0", "."]}}}
 ```
+
+(Pin the exact version — `name@x.y.z`, never a bare name or range: the code that installs must be the code that was reviewed, the house's own update-posture A and the plugin directory's hard rule alike. Bump the pin deliberately, release by release.)
 
 **Credentials, the house pattern** (this server needs none — local files over stdio; teach the pattern whenever wiring any server that does): a secret never goes in `.mcp.json`. Three ways, in order of preference — (1) the server supports OAuth: `/mcp` → log in; no file ever holds anything; (2) the server takes a token: the stanza carries only a *reference* (`"env": {"SERVICE_TOKEN": "${SERVICE_TOKEN}"}`), the *value* lives in never-committed `.claude/settings.local.json` under `"env": { ... }`; (3) stdio servers over local data (like this one): no credential exists to place. Field-proven: the house's own hives are wired exactly this way. **Verify**: `mcp__adrs4ai__list_open_questions` returns this repo's real questions.
 
