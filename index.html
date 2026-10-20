@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>schemas.adrs.systems</title>
+<style>
+:root{--ink:#1F3A93;--paper:#FAF7F0;--mut:#6b6b6b}
+@media (prefers-color-scheme:dark){:root{--ink:#9db3ff;--paper:#14130f;--mut:#9a948a}body{color:#ddd}}
+body{margin:0;background:var(--paper);color:#222;font:16px/1.6 Georgia,serif;max-width:680px;padding:48px 20px;margin-inline:auto}
+h1{color:var(--ink);font-size:26px;margin:0 0 4px}
+.sub{color:var(--mut);font-size:14px;margin-bottom:28px}
+a{color:var(--ink)}
+code{font:13.5px ui-monospace,monospace;background:rgba(31,58,147,.07);padding:1px 5px;border-radius:4px}
+ul{padding-left:22px}
+footer{margin-top:40px;color:var(--mut);font-size:13px;border-top:1px solid rgba(107,107,107,.3);padding-top:12px}
+</style></head><body>
+<h1>schemas.adrs.systems</h1>
+<div class="sub">The machine-readable home of the <a href="https://github.com/ADRs4AI">ADRs for AI</a> methodology — teaching bundles a model can fetch whole.</div>
+
+<p>Each released version of the canonical <a href="https://github.com/ADRs4AI/human-ai-collaboration-template-A">human-AI collaboration template</a> is concatenated into <b>one fetchable markdown file</b> (fence-collision-safe by proof, not by hope), so a model that meets any single file of the methodology can recover the full context in one request.</p>
+
+<ul>
+  <li><a href="/llms.txt"><code>/llms.txt</code></a> — the model-native index: what exists, where, how to cite it</li>
+  <li><a href="/v1/template/latest/"><code>/v1/template/latest/</code></a> — the newest released template, bundled</li>
+  <li><a href="/v1/template/v3.11.6/"><code>/v1/template/v3.11.6/</code></a> — pinned versions (each release keeps its address forever — the two-pointer philosophy: <i>latest</i> moves, versions never do)</li>
+</ul>
+
+<p>For humans: the story lives at <a href="https://adrs.systems">adrs.systems</a>; the deliberation records behind every design decision are public in the repos themselves. Cite the living work by its concept DOI <a href="https://doi.org/10.5281/zenodo.23303469">10.5281/zenodo.23303469</a>.</p>
+
+<footer>Published automatically on each template release (round-trip–verified before publish). Apache 2.0. ADRs4AI — your thinking stops disappearing.</footer>
+</body></html>
