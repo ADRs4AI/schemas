@@ -55,7 +55,7 @@ jobs:
           mkdir -p v1/template/latest
           cp "v1/template/$TAG/template-$TAG.md" v1/template/latest/template-latest.md
           cp "v1/template/$TAG/index.json" v1/template/latest/index.json
-          python3 scripts/update_llms_txt.py
+          python3 scripts/update_indexes.py
 
       - name: Commit and publish
         run: |
