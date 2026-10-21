@@ -9,6 +9,7 @@
 ## The bundle
 
 - [Latest (mutable alias, re-resolved at use)](https://schemas.adrs.systems/v1/template/latest/template-latest.md)
+- [v3.12.2 (immutable)](https://schemas.adrs.systems/v1/template/v3.12.2/template-v3.12.2.md)
 - [v3.12.1 (immutable)](https://schemas.adrs.systems/v1/template/v3.12.1/template-v3.12.1.md)
 - [v3.12.0 (immutable)](https://schemas.adrs.systems/v1/template/v3.12.0/template-v3.12.0.md)
 - [v3.11.6 (immutable)](https://schemas.adrs.systems/v1/template/v3.11.6/template-v3.11.6.md)

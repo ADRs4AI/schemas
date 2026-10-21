@@ -1,10 +1,10 @@
 {
   "what": "ADRs4AI teaching bundle \u2014 machine index",
-  "tag": "v3.12.1",
-  "built": "2026-10-20T21:27:23Z",
+  "tag": "v3.12.2",
+  "built": "2026-10-21T21:51:25Z",
   "source": "https://github.com/ADRs4AI/human-ai-collaboration-template-A",
   "concept_doi": "10.5281/zenodo.23303469",
-  "bundle": "template-v3.12.1.md",
+  "bundle": "template-v3.12.2.md",
   "files": [
     "CLAUDE.md",
     "README.md",

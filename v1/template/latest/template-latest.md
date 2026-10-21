@@ -1,10 +1,10 @@
-# ADRs for AI: Human-AI Collaboration Template A — teaching bundle, v3.12.1
+# ADRs for AI: Human-AI Collaboration Template A — teaching bundle, v3.12.2
 
 > **What this is**: the complete teaching corpus of the ADRs4AI methodology,
 > concatenated into one fetchable file — one-file access to the whole picture, so a model that encounters one of the subfiles can automatically, painlessly recover the full context.
 >
-> - **Source**: https://github.com/ADRs4AI/human-ai-collaboration-template-A at tag `v3.12.1` (commit `062ad76`)
-> - **Built**: 2026-10-20T21:27:23Z by the schemas publisher (https://github.com/ADRs4AI/schemas)
+> - **Source**: https://github.com/ADRs4AI/human-ai-collaboration-template-A at tag `v3.12.2` (commit `4e4432b`)
+> - **Built**: 2026-10-21T21:51:25Z by the schemas publisher (https://github.com/ADRs4AI/schemas)
 > - **Cite the living work**: concept DOI `10.5281/zenodo.23303469` (always resolves to the
 >   latest archived release); pin a version DOI only for reproducibility claims.
 > - **License**: Apache-2.0 — the full text travels in this bundle (see `LICENSE`
@@ -20,8 +20,8 @@
 
 ## CONTENTS
 
-- `CLAUDE.md` (19900 bytes)
-- `README.md` (14314 bytes)
+- `CLAUDE.md` (20136 bytes)
+- `README.md` (14830 bytes)
 - `QUICK-START.md` (4147 bytes)
 - `LICENSE` (11358 bytes)
 - `NOTICE` (233 bytes)
@@ -39,8 +39,8 @@
 - `docs/inbox/ENCODING-MAP.md` (3557 bytes)
 - `docs/inbox/INBOX-PROTOCOL.md` (17763 bytes)
 - `docs/inbox/ONBOARDING.md` (12077 bytes)
-- `.claude/skills/adr-authoring/SKILL.md` (15604 bytes)
-- `.claude/skills/adrs4ai-tooling/SKILL.md` (20050 bytes)
+- `.claude/skills/adr-authoring/SKILL.md` (16554 bytes)
+- `.claude/skills/adrs4ai-tooling/SKILL.md` (22315 bytes)
 - `.claude/skills/question-tours/SKILL.md` (24810 bytes)
 - `.claude/skills/adr-authoring/references/depth.md` (5631 bytes)
 - `.claude/skills/adr-authoring/references/freshening.md` (7959 bytes)
@@ -279,7 +279,7 @@ DOC:  # Documentation
 NOT:  # Notes, remarks, comments, observations
 ```
 
-**Find things — the typed verbs come first, grep is the fallback.** If this session has the `adrs4ai` MCP tools (look for `mcp__adrs4ai__*`), prefer them: they parse the record's grammar instead of reconstructing it, and writes through them cannot fumble a status flip. The ladder, macro → micro: `list_open_questions` (what needs answers, repo-wide) → `lookup` (one record) → `get_outline` → `get_sections` (section-level detail — **this rung exists; take it before reaching for grep**) → `answer_question` / `apply_batch` (writes). No MCP in the session? This repo's `.mcp.json` already carries the stanza (`@adrs4ai/mcp` via npx, server key `adrs4ai`) — a session restart loads it; the `adrs4ai-tooling` skill teaches the rest, and the whole operator layer (these skills + `/adr:*` commands) is installable once, account-wide, as the **`adr` plugin**: `/plugin marketplace add ADRs4AI/plugins` → `/plugin install adr@adrs4ai`. Meanwhile the honest fallback:
+**Find things — the typed verbs come first, grep is the fallback.** If this session has the `adrs4ai` MCP tools (look for `mcp__adrs4ai__*`), prefer them: they parse the record's grammar instead of reconstructing it, and writes through them cannot fumble a status flip. The ladder, macro → micro: `list_open_questions` (what needs answers, repo-wide) → `lookup` (one record) → `get_outline` → `get_sections` (section-level detail — **this rung exists; take it before reaching for grep**) → `answer_question` / `apply_batch` (writes). No MCP in the session? The same verbs answer in any shell — **the CLI, the second mouth**: `npx -y @adrs4ai/docket list-open` (always scoped, never bare `docket`; writes dry-run by default; exit codes certify structure, never readiness). This repo's `.mcp.json` already carries the MCP stanza (`@adrs4ai/mcp` via npx, server key `adrs4ai`) — a session restart loads it; the `adrs4ai-tooling` skill teaches both mouths, and the whole operator layer (these skills + `/adr:*` commands) is installable once, account-wide, as the **`adr` plugin**: `/plugin marketplace add ADRs4AI/plugins` → `/plugin install adr@adrs4ai`. Meanwhile the honest last-resort fallback:
 
 ```bash
 grep -E '^### QST(-[A-Za-z0-9-]{1,24})?:' -r docs/adr/   # All questions — both canonical forms; a bare '^### QST:' grep silently misses every handled question
@@ -693,8 +693,12 @@ Home: [`ADRs4AI/plugins`](https://github.com/ADRs4AI/plugins) (Apache 2.0; versi
 Agents shouldn't grep a decision record; they should ask it. The [`@adrs4ai/mcp`](https://www.npmjs.com/package/@adrs4ai/mcp) server gives any MCP client — Claude Code, or anything speaking the protocol — typed verbs over the record (`list_open_questions`, `lookup`, `answer_question`, `apply_batch`, and the rest), through the format's one parser, [`@adrs4ai/docket-core`](https://www.npmjs.com/package/@adrs4ai/docket-core). Repos born from this template (v3.12 and later) already carry the stanza in `.mcp.json` at the root — a session restart loads it. Any other repo adds exactly this (the `.` is the repo the session sits in):
 
 ```json
-{ "mcpServers": { "adrs4ai": { "command": "npx", "args": ["-y", "@adrs4ai/mcp", "."] } } }
+{ "mcpServers": { "adrs4ai": { "command": "npx", "args": ["-y", "@adrs4ai/mcp@0.1.1", "."] } } }
 ```
+
+(Pin the exact version and bump deliberately — the code that installs is the code that was reviewed.)
+
+The same verbs answer in any shell without a session: **the CLI, the record's second mouth** — [`@adrs4ai/docket`](https://www.npmjs.com/package/@adrs4ai/docket), always invoked scoped (`npx -y @adrs4ai/docket list-open`, never bare `docket`). Twelve clerking verbs plus the `tour` group, writes dry-run by default (`--apply`), and one law on its face: *exit codes certify structure, never readiness*.
 
 The `adr` plugin above and this server are the same operator layer through two doors: the plugin carries the *teaching* (skills and commands), the MCP carries the *verbs*. Install both; they never conflict.
 
@@ -4028,6 +4032,11 @@ Every pair below is a real, uncorrected specimen from this ecosystem's own corpu
 **Always**: the ANS states the decision actually made; a pending verdict gets its **own minted follow-up QST** (with a relates/blocks edge back), so the open thing is a real question the machinery can see. For small cases, the status valve is the lightweight middle: `- Status: answered — trial; verdict QST to follow by <condition>`. The ANS slot's contract is absolute: *this text IS the answer.*
 *(Field specimen with receipts, companion-étude ADR-0064, 2026-10; class predicted 2026-07-30 in vscode ADR-0032's annotated-status work; detection ruled closed — prevention-only — same arc. The ✓ reframe is Docent 5's; the answer-time follow-up affordance now exists tool-side, so the fix is often one click.)*
 
+**Never** — "QST" as prose vocabulary (the **generic-QST**):
+> "every decision above was ruled in conversation or a prior QST (cited)"
+**Always**: the token either **mints** (`### QST:` heading) or **points** (a specific `QST-<ID>` citation); in running text, write *question* — "ruled in conversation or a prior question (QST-LEXICON-DISPATCH)". The founder's rule, verbatim: *"'QST' should not be used in any other context than to instantiate an actual specific QST."* Why it matters though it breaks no parser: the token's value IS its grep-signal — every occurrence should be structure or citation (the ⟦SIGIL⟧ principle, №85: *every-occurrence-authored*), and generic use trains the next imitator to blur a load-bearing marker into chatter.
+*(Founder-caught at muster, ADR-0013:33, 2026-10-20 — the same file cites three handles correctly at lines 25/29, so the specimen shows exactly where the line sits; relayed by Gleaner 5.)*
+
 ## 4. The handle grammar, in one line (plus the fragility worth knowing)
 
 `### QST:` is always valid. `### QST-<id>:` adds a citable handle when anything will refer back to the question — `id` is 1–24 letters/digits with interior hyphens (`QST-STATUS-AUTHORITY` is valid; `QST_2` and `QST-` are not). Once a handle is cited anywhere, it never changes — reword the question freely, the id is the anchor. A plain `### QST:` heading still gets an *auto-derived* handle slugified from its text — fragile: retitling silently changes it and breaks existing references; prefer an explicit id (or an `<!-- @adr-anchor: qst-... -->` comment placed *after* the heading) for anything tour- or citation-bound.
@@ -4063,7 +4072,7 @@ This template ships wired for a toolchain it cannot assume is installed. This sk
 
 ## 1. Where am I? (run this entry first, always)
 
-**Detect**: is this repo a template instance? Signs: `kintsugi.yaml` at root, `docs/adr/templates/`, a CLAUDE.md carrying the directives. — **If yes**: your job is completing this repo's toolchain; continue down the roster. — **If no** (bare repo, or no repo at all): you are the **spore**. This skill alone is enough to fetch the methodology:
+**Detect**: is this repo a template instance? Signs: `kintsugi.yaml` at root, `docs/adr/templates/`, a CLAUDE.md carrying the directives. — **If yes: run the arrival ritual, in order, before anything else on this roster** (the founder's rule, 2026-10-20): **(1) freshness** — `kintsugi status`, read-only and free (entry 10 installs the tool if it's missing — that install is part of the ritual, not a detour); behind → **offer `kintsugi update` as the first move**: each update is a conversation (keep/take/merge, file by file), so the *when* is the human's — but a stale instance mis-teaches every entry below, and outside the founding estate this is the ONLY delivery path that exists; nobody waves your fleet for you. **(2) the gate** — `just instantiate-check`: unfilled ⟦SIGILS⟧ and lingering fixture files are each named with their why; offer the fill-and-delete pass (fixture deletions are mandated, never judgment calls). **(3) then** continue down the roster. — **If no** (bare repo, or no repo at all): you are the **spore**. This skill alone is enough to fetch the methodology:
 
 - **Explain** (three sentences, any register): ADRs4AI is a methodology for durable human-AI collaboration — decisions and open questions live in parseable records (ADRs) next to the code, so reasoning survives sessions, models, and years. The template ships the record formats, the teaching skills, and a crew layer for running many sessions as named seats. The founding essay is at `https://adrs.systems/what-is/`.
 - **Offer**: (a) *new project* — instantiate `https://github.com/ADRs4AI/human-ai-collaboration-template-A` ("Use this template" on GitHub, or `gh repo create <name> --template ADRs4AI/human-ai-collaboration-template-A`); (b) *existing project* — adopt via kintsugi (entry 10: install it, then `kintsugi adopt` offers the template's files one by one, never clobbering); (c) *just curious* — the essay, no tooling.
@@ -4082,12 +4091,14 @@ This template ships wired for a toolchain it cannot assume is installed. This sk
 **Detect**: does the session have `mcp__adrs4ai__*` tools? (`/mcp` lists connected servers. A hive wired before 2026-10-20 may carry the retired key `adrs-for-ai` — same tools; offer the re-key, it is one word in `.mcp.json`.) **Explain**: without it you grep the record; with it you get typed verbs — `list_open_questions`, `answer_question`, `apply_batch` — that answer in seconds what greps reconstruct, and never fumble a status flip. **Offer**: the server is live on npm — `@adrs4ai/mcp`, a thin stdio mouth over `@adrs4ai/docket-core`. Template instances born ≥ v3.12 ship the stanza in `.mcp.json` at root; a session restart loads it. Older instances and bare repos add exactly this (the `.` is the corpus root — the repo the session sits in):
 
 ```json
-{"mcpServers": {"adrs4ai": {"command": "npx", "args": ["-y", "@adrs4ai/mcp@0.1.0", "."]}}}
+{"mcpServers": {"adrs4ai": {"command": "npx", "args": ["-y", "@adrs4ai/mcp@0.1.1", "."]}}}
 ```
 
 (Pin the exact version — `name@x.y.z`, never a bare name or range: the code that installs must be the code that was reviewed, the house's own update-posture A and the plugin directory's hard rule alike. Bump the pin deliberately, release by release.)
 
 **Credentials, the house pattern** (this server needs none — local files over stdio; teach the pattern whenever wiring any server that does): a secret never goes in `.mcp.json`. Three ways, in order of preference — (1) the server supports OAuth: `/mcp` → log in; no file ever holds anything; (2) the server takes a token: the stanza carries only a *reference* (`"env": {"SERVICE_TOKEN": "${SERVICE_TOKEN}"}`), the *value* lives in never-committed `.claude/settings.local.json` under `"env": { ... }`; (3) stdio servers over local data (like this one): no credential exists to place. Field-proven: the house's own hives are wired exactly this way. **Verify**: `mcp__adrs4ai__list_open_questions` returns this repo's real questions.
+
+**The second mouth — the CLI** (the same handler set, for shells, CI, and humans): `npx @adrs4ai/docket <verb>` — **always scoped, never bare `docket`** (a dormant npm squatter owns the unscoped name). **Detect**: `npx -y @adrs4ai/docket --help` prints the verb table. **Explain**: twelve clerking verbs (`lookup`, `list-open`, `overview`, `outline`, `sections`, `answer`, `recommend`, `iterate`, `resolve`, `bless`, `report`, `refresh`) plus the `tour` group (`add` / `annotate` / `drop` / `list` / `move` / `retire` / `show`); writes are **dry-run by default** (`--apply` writes); **exit codes certify structure, never readiness** — 0 valid result including an empty one · 1 not found · 2 refused · 3 bad invocation. **Offer**: nothing to install — npx resolves it; in anything durable (CI, scripts, docs) pin exact: `npx -y @adrs4ai/docket@0.1.1 <verb>`. **Verify**: `npx -y @adrs4ai/docket list-open` prints this repo's real open questions. **Per-mouth grammar, binding**: each mouth teaches its own names — the CLI's verbs on shell surfaces, `mcp__adrs4ai__*` on session surfaces, never crossed (a footer teaching the wrong mouth was the CLI's one cold-pass NOT-READY, fixed before its tag).
 
 ## 5. Terminals (launching a hive in one gesture)
 
@@ -4113,7 +4124,7 @@ This template ships wired for a toolchain it cannot assume is installed. This sk
 
 ## 10. kintsugi (the template maintains its copies)
 
-**Detect**: `kintsugi --version`; and note whether `kintsugi.yaml` + `kintsugi.lock` exist at root. **Explain**: that yaml is a manifest — the list of files this repo received from the template and how each may evolve; kintsugi is the tool that reads it: `kintsugi status` says what drifted, `kintsugi update` offers new template releases file by file, keep/take/merge with reasons, never a silent overwrite. It is how this repo stays current *without* losing its own adaptations. **Offer**: `uv tool install adrs4ai-kintsugi`; run `kintsugi status` immediately after (it is read-only) and narrate what it shows. **Verify**: status prints the artifact table. **When to run update**: when told a template release shipped, or on a rhythm; each update is a conversation, not a migration.
+**Detect**: `kintsugi --version`; and note whether `kintsugi.yaml` + `kintsugi.lock` exist at root. **Explain**: that yaml is a manifest — the list of files this repo received from the template and how each may evolve; kintsugi is the tool that reads it: `kintsugi status` says what drifted, `kintsugi update` offers new template releases file by file, keep/take/merge with reasons, never a silent overwrite. It is how this repo stays current *without* losing its own adaptations. **Offer**: `uv tool install adrs4ai-kintsugi`; run `kintsugi status` immediately after (it is read-only) and narrate what it shows. **Verify**: status prints the artifact table. **When to run update**: FIRST THING on arriving in an instance that `status` shows behind (entry 1's freshness step — offer it, the human picks the moment); when told a template release shipped; or on a rhythm. Each update is a conversation, not a migration.
 
 ## 11. CI lint (the record's grammar, gated)
 
@@ -4129,7 +4140,7 @@ This template ships wired for a toolchain it cannot assume is installed. This sk
 
 ## 14. The mirror — publish the code without the record (no-adrs-mirror)
 
-**Detect**: the human wants a repo's code public (or shareable) while the deliberation layer must stay private — license-gated records, a publication not yet ruled, a client's eyes on code only. **Explain**: `github.com/ADRs4AI/no-adrs-mirror` is a GitHub Action for a private repo: each push to main rebuilds a second repository — the mirror — with the same code byte for byte, the record paths removed (`docs/adr`, `docs/inbox`, `CLAUDE.md`, `.claude`, `.mcp.json`, the working exhaust — overridable via `strip_paths`), and exactly one generated file, `DELIBERATIONS-NOTICE.md`, stating what exists and was withheld. Shipping and disclosing keep separate clocks — open, digest, closed, or *not yet*; "not yet" is a setting, not a confession, and closed is still ahead of gone. **The law**: the Action never changes repository visibility — mirrors are born private; going public is the owner's own act, every time. **Offer**: wire the Action in the private repo per its README (the Action's repo is public); the mirror conventionally named `<repo>-no-adrs`. **Verify**: after a push, the mirror holds the code, none of the record paths, and the NOTICE names what was withheld.
+**Detect**: the human wants a repo's code public (or shareable) while the deliberation layer must stay private — license-gated records, a publication not yet ruled, a client's eyes on code only. **Explain**: `github.com/ADRs4AI/no-adrs-mirror` is a GitHub Action for a private repo: each push to main rebuilds a second repository — the mirror — with the same code byte for byte, the record paths removed (`docs/adr`, `docs/inbox`, `CLAUDE.md`, `.claude`, `.mcp.json`, the working exhaust — overridable via `strip_paths`), and exactly one generated file, `DELIBERATIONS-NOTICE.md`, stating what exists and was withheld. Shipping and disclosing keep separate clocks — open, digest, closed, or *not yet*; "not yet" is a setting, not a confession, and closed is still ahead of gone. **The law**: the Action never changes repository visibility — mirrors are born private; going public is the owner's own act, every time. **Offer**: wire the Action in the private repo — load the Action repo's own wiring skill first (`.claude/skills/no-adrs-mirror/SKILL.md` there, public, versioned with the tool: the dry-run-first ladder, the fail-closed gates, the token walkthrough); the mirror conventionally named `<repo>-no-adrs`. **Verify**: after a push, the mirror holds the code, none of the record paths, and the NOTICE names what was withheld.
 
 ## The delivery loop (this skill's first job)
 
