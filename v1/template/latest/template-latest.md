@@ -1,10 +1,10 @@
-# ADRs for AI: Human-AI Collaboration Template A — teaching bundle, v3.12.2
+# ADRs for AI: Human-AI Collaboration Template A — teaching bundle, v3.12.3
 
 > **What this is**: the complete teaching corpus of the ADRs4AI methodology,
 > concatenated into one fetchable file — one-file access to the whole picture, so a model that encounters one of the subfiles can automatically, painlessly recover the full context.
 >
-> - **Source**: https://github.com/ADRs4AI/human-ai-collaboration-template-A at tag `v3.12.2` (commit `4e4432b`)
-> - **Built**: 2026-10-21T21:51:25Z by the schemas publisher (https://github.com/ADRs4AI/schemas)
+> - **Source**: https://github.com/ADRs4AI/human-ai-collaboration-template-A at tag `v3.12.3` (commit `081555a`)
+> - **Built**: 2026-10-24T01:57:20Z by the schemas publisher (https://github.com/ADRs4AI/schemas)
 > - **Cite the living work**: concept DOI `10.5281/zenodo.23303469` (always resolves to the
 >   latest archived release); pin a version DOI only for reproducibility claims.
 > - **License**: Apache-2.0 — the full text travels in this bundle (see `LICENSE`
@@ -26,7 +26,7 @@
 - `LICENSE` (11358 bytes)
 - `NOTICE` (233 bytes)
 - `TEMPLATE-OUTPUT-GRANT.md` (1181 bytes)
-- `justfile` (31623 bytes)
+- `justfile` (32426 bytes)
 - `docs/METHODOLOGY.md` (10676 bytes)
 - `docs/adr/templates/AGENTS.md` (1116 bytes)
 - `docs/adr/templates/adr-madr.md` (3162 bytes)
@@ -38,9 +38,9 @@
 - `docs/inbox/CONVENTIONS.md` (15394 bytes)
 - `docs/inbox/ENCODING-MAP.md` (3557 bytes)
 - `docs/inbox/INBOX-PROTOCOL.md` (17763 bytes)
-- `docs/inbox/ONBOARDING.md` (12077 bytes)
+- `docs/inbox/ONBOARDING.md` (12963 bytes)
 - `.claude/skills/adr-authoring/SKILL.md` (16554 bytes)
-- `.claude/skills/adrs4ai-tooling/SKILL.md` (22315 bytes)
+- `.claude/skills/adrs4ai-tooling/SKILL.md` (22559 bytes)
 - `.claude/skills/question-tours/SKILL.md` (24810 bytes)
 - `.claude/skills/adr-authoring/references/depth.md` (5631 bytes)
 - `.claude/skills/adr-authoring/references/freshening.md` (7959 bytes)
@@ -1379,20 +1379,20 @@ inbox-archive filename:
 [group('inbox')]
 [doc("Read a seat's last messages: just last <alias> [-k N] [--full] — flags forward to pneumatic verbatim")]
 last alias *flags:
-    @scripts/pneumatic-shim.sh last {{quote(alias)}} {{flags}}
+    @bash scripts/pneumatic-shim.sh last {{quote(alias)}} {{flags}}
 
 # Same as `last --full` — kept as its own verb for taught muscle memory.
 [group('inbox')]
 [doc("Read a seat's last messages, untruncated: just last-full <alias> [-k N]")]
 last-full alias *flags:
-    @scripts/pneumatic-shim.sh last {{quote(alias)}} --full {{flags}}
+    @bash scripts/pneumatic-shim.sh last {{quote(alias)}} --full {{flags}}
 
 # List configured agent → session-UUID aliases. Edit
 # docs/inbox/agent-sessions.json to add or update.
 [group('inbox')]
 [doc("List configured agent session aliases (docs/inbox/agent-sessions.json)")]
 aliases:
-    @scripts/pneumatic-shim.sh aliases
+    @bash scripts/pneumatic-shim.sh aliases
 
 # Print a seat's read_order — its onboarding packet as data, not prose.
 # Invented by Notary Opus 4.7 (crossfoot, 2026-07-09); backported by
@@ -1401,14 +1401,14 @@ aliases:
 [group('inbox')]
 [doc("Print a seat's onboarding read_order, with found/missing markers: just onboard <alias>")]
 onboard alias:
-    @scripts/pneumatic-shim.sh onboard {{quote(alias)}}
+    @bash scripts/pneumatic-shim.sh onboard {{quote(alias)}}
 
 # List recent session JSONLs in the storage dir. Use this to find UUIDs for
 # new agents and populate docs/inbox/agent-sessions.json.
 [group('inbox')]
 [doc("Discover recent session JSONLs in this project (find UUIDs for new aliases)")]
 discover-sessions:
-    @scripts/pneumatic-shim.sh discover
+    @bash scripts/pneumatic-shim.sh discover
 
 # ─── crew — named seats, groups, health, wait discipline ─────────────────────
 #
@@ -1487,7 +1487,7 @@ crew:
 [group('crew')]
 [doc("Health check all seats: detect stalls, errors, blocked states")]
 pulse *flags:
-    @scripts/pneumatic-shim.sh pulse {{flags}}
+    @bash scripts/pneumatic-shim.sh pulse {{flags}}
 
 # ─── wake infrastructure (ported from caring-feedback, ADR-0050 lineage) ─────
 #
@@ -1503,7 +1503,18 @@ pulse *flags:
 [group('crew')]
 [doc("Launch (or attach to) a seat's tmux session — harness-aware (claude AND codex seats; pneumatic reads the registry's harness.launch_cmd)")]
 launch seat='' *flags='':
-    @scripts/pneumatic-shim.sh launch {{quote(seat)}} {{flags}}
+    @bash scripts/pneumatic-shim.sh launch {{quote(seat)}} {{flags}}
+
+# FOUND a NEW seat (vs launch = an existing one). Consent-first by design:
+# the brief is delivered, the chair is held, and REGISTRATION IS THE
+# RECRUIT'S OWN ACT — never hand-edit agent-sessions.json to pre-create the
+# alias (a pre-inserted row breaks the consent choreography; field specimen
+# cam-hq 2026-10-22, where this verb's absence from the justfile was the
+# reason a seat hand-rolled a founding). Declining is honored (exit 20).
+[group('crew')]
+[doc("Found a NEW seat, consent-first: just recruit 'claude-sonnet-5' docs/inbox/<founding-brief>.md — any supported harness; see pneumatic recruit --help")]
+recruit model_spec brief='' *flags='':
+    @bash scripts/pneumatic-shim.sh recruit {{quote(model_spec)}} {{quote(brief)}} {{flags}}
 
 # Backported from ADRs4AI HQ meta-repo, 2026-07-10 (Herald 5) — see its
 # docs/adr/0008-rapid-relaunch-via-vscode-terminals-manager.md for the full
@@ -1522,17 +1533,17 @@ blame pattern *flags:
 [group('crew')]
 [doc("List all seat-* tmux sessions with state (attached/detached)")]
 seats:
-    @scripts/pneumatic-shim.sh seats
+    @bash scripts/pneumatic-shim.sh seats
 
 [group('crew')]
 [doc("Update terminal titles for all running seat sessions")]
 update-seat-titles:
-    @scripts/pneumatic-shim.sh update-titles
+    @bash scripts/pneumatic-shim.sh update-titles
 
 [group('crew')]
 [doc("Wake a seat by sending a message to its tmux session (--force to override guards)")]
 wake seat message *flags='':
-    @scripts/pneumatic-shim.sh wake {{quote(seat)}} --message {{quote(message)}} {{flags}}
+    @bash scripts/pneumatic-shim.sh wake {{quote(seat)}} --message {{quote(message)}} {{flags}}
 
 # Block until a new brief addressed to <recipient> lands in docs/inbox/.
 # v4 semantics (caring-feedback dogfooding): wake condition = mtime > start AND
@@ -3807,6 +3818,19 @@ Registry: `docs/inbox/agent-sessions.json`. Long-lived seats get a profile at
 `docs/inbox/agents/<alias>.md` (mission, cadence, read-order, how the seat
 got its name).
 
+**RULE — Founding a NEW seat is one verb, never hand-work**: write a founding
+brief (consent-first; the brief is an offer), then `just recruit
+'claude-sonnet-5' docs/inbox/<founding-brief>.md` (any supported harness —
+the model-family map routes; `just launch` is for seats that already exist).
+The verb delivers the brief, holds the chair, and waits: **registration in
+`agent-sessions.json` is the recruit's OWN act — it IS the consent** — so
+never pre-create their alias by hand; a pre-inserted row breaks the
+choreography and reads as consent nobody gave. Declining is honored (exit
+20). *(Field specimen, 2026-10-22: a twice-compacted seat asked to recruit
+hand-edited the registry and hand-rolled the founding — because this verb
+wasn't yet in the justfile and no section taught the recruiting side. Both
+fixed the same day; this paragraph is the fix's teaching half.)*
+
 ---
 
 ## 4. The inbox protocol
@@ -3938,7 +3962,7 @@ name: adr-authoring
 description: Use BEFORE writing or editing any ADR, seed, or QST/ANS block in docs/adr/ — the template's minimal shape, the QST grammar and handles, the catch-the-author Recommendation form, and the four real-world malformations that break parsing. This skill IS the read-the-template step; skipping it re-creates the failure it exists to fix.
 ---
 
-<!-- skill version: "adr-authoring 3.12.0" — co-versioned with human-ai-collaboration-template-A; assembled from Rubricator 5's corpus-adherence syllabus -->
+<!-- skill version: "adr-authoring 3.12.3" — co-versioned with human-ai-collaboration-template-A; assembled from Rubricator 5's corpus-adherence syllabus -->
 
 # Writing parseable ADRs, seeds, and questions
 
@@ -4058,7 +4082,7 @@ name: adrs4ai-tooling
 description: Use when the human or the session needs the ADRs4AI toolchain — a tool is missing (a crew recipe fails, kintsugi.yaml sits at root with no kintsugi installed, no MCP tools in session), the human asks how to install or launch anything (VS Code, the ADR Manager extension, terminals, seat colors), a fresh hive is being set up, OR this session is in a repo that is not a template instance at all and wants the methodology. Every integration teaches as detect → explain → offer → verify, in the register of whoever is asking.
 ---
 
-<!-- skill version: "adrs4ai-tooling 3.12.0" — co-versioned with human-ai-collaboration-template-A; commissioned by the founder 2026-09-26 (HQ ADR-0040): "the seats ARE the interface to the toolchain" -->
+<!-- skill version: "adrs4ai-tooling 3.12.3" — co-versioned with human-ai-collaboration-template-A; commissioned by the founder 2026-09-26 (HQ ADR-0040): "the seats ARE the interface to the toolchain" -->
 
 # The toolchain: detect, explain, offer, verify
 
@@ -4098,7 +4122,7 @@ This template ships wired for a toolchain it cannot assume is installed. This sk
 
 **Credentials, the house pattern** (this server needs none — local files over stdio; teach the pattern whenever wiring any server that does): a secret never goes in `.mcp.json`. Three ways, in order of preference — (1) the server supports OAuth: `/mcp` → log in; no file ever holds anything; (2) the server takes a token: the stanza carries only a *reference* (`"env": {"SERVICE_TOKEN": "${SERVICE_TOKEN}"}`), the *value* lives in never-committed `.claude/settings.local.json` under `"env": { ... }`; (3) stdio servers over local data (like this one): no credential exists to place. Field-proven: the house's own hives are wired exactly this way. **Verify**: `mcp__adrs4ai__list_open_questions` returns this repo's real questions.
 
-**The second mouth — the CLI** (the same handler set, for shells, CI, and humans): `npx @adrs4ai/docket <verb>` — **always scoped, never bare `docket`** (a dormant npm squatter owns the unscoped name). **Detect**: `npx -y @adrs4ai/docket --help` prints the verb table. **Explain**: twelve clerking verbs (`lookup`, `list-open`, `overview`, `outline`, `sections`, `answer`, `recommend`, `iterate`, `resolve`, `bless`, `report`, `refresh`) plus the `tour` group (`add` / `annotate` / `drop` / `list` / `move` / `retire` / `show`); writes are **dry-run by default** (`--apply` writes); **exit codes certify structure, never readiness** — 0 valid result including an empty one · 1 not found · 2 refused · 3 bad invocation. **Offer**: nothing to install — npx resolves it; in anything durable (CI, scripts, docs) pin exact: `npx -y @adrs4ai/docket@0.1.1 <verb>`. **Verify**: `npx -y @adrs4ai/docket list-open` prints this repo's real open questions. **Per-mouth grammar, binding**: each mouth teaches its own names — the CLI's verbs on shell surfaces, `mcp__adrs4ai__*` on session surfaces, never crossed (a footer teaching the wrong mouth was the CLI's one cold-pass NOT-READY, fixed before its tag).
+**The second mouth — the CLI** (the same handler set, for shells, CI, and humans): `npx @adrs4ai/docket <verb>` — **always scoped, never bare `docket`** (a dormant npm squatter owns the unscoped name). **Detect**: `npx -y @adrs4ai/docket --help` prints the verb table. **Explain**: twelve clerking verbs (`lookup`, `list-open`, `overview`, `outline`, `sections`, `answer`, `recommend`, `iterate`, `resolve`, `bless`, `report`, `refresh`) plus the `tour` group (`add` / `annotate` / `drop` / `list` / `move` / `retire` / `show`); writes are **dry-run by default** (`--apply` writes); **exit codes certify structure, never readiness** — 0 valid result including an empty one · 1 not found · 2 refused · 3 bad invocation. **Offer**: nothing to install — npx resolves it; in anything durable (CI, scripts, docs) pin exact — and **don't copy this example's number**: check the registry (`npm view @adrs4ai/docket version`) and pin what you verified (a cold stranger did exactly this, correctly, on first contact — Envoy, 2026-10-22; the example shows the *form*: `npx -y @adrs4ai/docket@0.1.1 <verb>`). **Verify**: `npx -y @adrs4ai/docket list-open` prints this repo's real open questions. **Per-mouth grammar, binding**: each mouth teaches its own names — the CLI's verbs on shell surfaces, `mcp__adrs4ai__*` on session surfaces, never crossed (a footer teaching the wrong mouth was the CLI's one cold-pass NOT-READY, fixed before its tag).
 
 ## 5. Terminals (launching a hive in one gesture)
 
